@@ -11,16 +11,19 @@ caption into a multi-panel poster, exported as a PNG to share. Entry for the
 ## What it does
 
 - **Any photo:** upload your own photos (they never leave your machine) or try
-  the two free samples. Up to three photo slots feed the panels.
+  the four free samples. Up to three photo slots feed the panels.
 - **Four panel layouts:** Triple panel (hero left, two stacked right), Duo split
   (one diagonal cut), Four grid (classic poster grid), and Single photo
   full-bleed. Each panel can be cropped on its own — zoom, pan left–right,
   pan up–down.
-- **Three colour grades:** Vice Sunset (warm orange and magenta dusk with a
-  glowing sun), Neon Nights (cyan and magenta night glow), and Noir
-  (high-contrast black and white).
+- **Three colour grades:** Vice Sunset (blazing pink-orange dusk with a
+  striped synthwave sun, palm silhouettes, and a lit skyline), Neon Nights
+  (cyan and magenta night glow), and Noir (high-contrast black and white).
+  Every cover also gets a comic-book halftone dot texture and black-keyline
+  gutters, so the panels read as cut-outs from a poster.
 - **Bold caption lettering:** editable caption and sub-caption, size, top or
-  bottom position, and three lettering styles — Block, Outline, and Neon glow.
+  bottom position, and four lettering styles — Block, Outline, Neon glow, and
+  Vice (sunset gradient letters) — all squeezed tall like poster type.
 - **Export PNG:** one click exports the cover at 1080 x 1080, 1080 x 1350, or
   1920 x 1080, ready to post.
 
@@ -43,7 +46,9 @@ the bounty: it copies `app/` and `screenshots/` to `/output` and writes
 - `app/src/cover.js` — the cover renderer (layouts, panels, grades, caption)
 - `app/src/main.js` — editor wiring, photo loading, PNG export
 - `app/src/shots.js` — fixed scenes for screenshots (`?shot=cover|editor`)
-- `app/samples/` — two sample photos, made with an image model for make.fun
+- `app/samples/` — four sample photos: two made with an image model for
+  make.fun, plus Sunset Skyline and Neon Street, original illustrations
+  drawn for this entry
 - `screenshots/` — the entry's screenshots (first is the cover)
 - `shots.json` — the query and window size behind each screenshot
 - `vendor/makefun-app.ts` — the kit's dossier library, unchanged
@@ -60,3 +65,5 @@ New to make.fun? Sign up with my link: https://make.fun/r/vfa7ye18 (referral cod
 Cover dibuat dengan Neon Bay Cover Studio — 4 layout panel, 3 grade warna, ekspor PNG siap posting.
 
 Dibangun offline — foto tidak pernah keluar dari mesin.
+
+Tampilan barunya benar-benar Vice City — matahari senja bergaris, siluet pohon palem, skyline berpendar, dan tekstur halftone di setiap cover.
