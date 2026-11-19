@@ -1,5 +1,9 @@
 # Neon Bay Cover Studio
 
+[![make.fun · gta6-cover-art-01](https://make.fun/badge/gta6-cover-art-01.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
+[![rank](https://make.fun/badge/gta6-cover-art-01/fiqirealme52-max/GTACoverArt/rank.svg)](https://make.fun/bounty/gta6-cover-art-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
+[![reward](https://make.fun/badge/gta6-cover-art-01/fiqirealme52-max/GTACoverArt/reward.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
+
 A GTA-style cover art maker — an offline web app that turns a photo and a
 caption into a multi-panel poster, exported as a PNG to share. Entry for the
 [make.fun bounty "Make GTA 6 Cover Art"](https://make.fun/bounty/gta6-cover-art-01).
@@ -50,3 +54,5 @@ anywhere in this entry.
 ## License
 
 MIT — see `LICENSE`.
+
+New to make.fun? Sign up with my link: https://make.fun/r/vfa7ye18 (referral code `vfa7ye18`).
