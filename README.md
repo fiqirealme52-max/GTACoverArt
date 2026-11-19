@@ -56,3 +56,5 @@ anywhere in this entry.
 MIT — see `LICENSE`.
 
 New to make.fun? Sign up with my link: https://make.fun/r/vfa7ye18 (referral code `vfa7ye18`).
+
+Cover dibuat dengan Neon Bay Cover Studio — 4 layout panel, 3 grade warna, ekspor PNG siap posting.
