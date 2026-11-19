@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neon Bay Cover Studio — GTA-style poster maker</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">NB</span> NEON BAY <em>Cover Studio</em></div>
+  <p class="tagline">Your photo + a caption, made into a GTA-style poster. Photos never leave your machine.</p>
+</header>
+<main class="app">
+  <section class="controls" aria-label="Cover controls">
+    <div class="group">
+      <h2>1 · Photos</h2>
+      <p class="hint">Add up to three photos. Each panel shows one of them — use the samples to try it out.</p>
+      <div class="slot" data-slot="0">
+        <span class="slot-name">Photo A</span>
+        <img class="thumb" id="thumb0" alt="Photo A preview">
+        <label class="file-btn">Choose a photo <input id="file0" type="file" accept="image/*"></label>
+        <div class="sample-row">
+          <button type="button" class="mini" data-sample="0" data-photo="boulevard">Sample: Boulevard</button>
+          <button type="button" class="mini" data-sample="0" data-photo="pier">Sample: Pier</button>
+        </div>
+      </div>
+      <div class="slot" data-slot="1">
+        <span class="slot-name">Photo B</span>
+        <img class="thumb" id="thumb1" alt="Photo B preview">
+        <label class="file-btn">Choose a photo <input id="file1" type="file" accept="image/*"></label>
+        <div class="sample-row">
+          <button type="button" class="mini" data-sample="1" data-photo="boulevard">Sample: Boulevard</button>
+          <button type="button" class="mini" data-sample="1" data-photo="pier">Sample: Pier</button>
+        </div>
+      </div>
+      <div class="slot" data-slot="2">
+        <span class="slot-name">Photo C</span>
+        <img class="thumb" id="thumb2" alt="Photo C preview">
+        <label class="file-btn">Choose a photo <input id="file2" type="file" accept="image/*"></label>
+        <div class="sample-row">
+          <button type="button" class="mini" data-sample="2" data-photo="boulevard">Sample: Boulevard</button>
+          <button type="button" class="mini" data-sample="2" data-photo="pier">Sample: Pier</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="group">
+      <h2>2 · Layout</h2>
+      <div class="choices" id="layoutChoices" role="radiogroup" aria-label="Panel layout"></div>
+      <p class="hint" id="layoutHint"></p>
+    </div>
+
+    <div class="group">
+      <h2>3 · Crop a panel</h2>
+      <div class="choices" id="panelChoices" role="radiogroup" aria-label="Panel to crop"></div>
+      <label>Zoom <input id="zoom" type="range" min="1" max="2.5" step="0.05" value="1"></label>
+      <label>Pan left–right <input id="panX" type="range" min="-1" max="1" step="0.05" value="0"></label>
+      <label>Pan up–down <input id="panY" type="range" min="-1" max="1" step="0.05" value="0"></label>
+    </div>
+
+    <div class="group">
+      <h2>4 · Caption</h2>
+      <label>Caption <input id="caption" type="text" maxlength="28" value="Sunset Heist"></label>
+      <label>Sub-caption <input id="subcaption" type="text" maxlength="24" value="Neon Bay"></label>
+      <label>Caption size <input id="captionSize" type="range" min="0.6" max="1.5" step="0.05" value="1"></label>
+      <label>Caption position
+        <select id="captionPos">
+          <option value="bottom" selected>Bottom</option>
+          <option value="top">Top</option>
+        </select>
+      </label>
+      <label>Lettering style
+        <select id="captionStyle">
+          <option value="block" selected>Block — white on dark outline</option>
+          <option value="outline">Outline — hollow white letters</option>
+          <option value="neon">Neon — cyan and magenta glow</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="group">
+      <h2>5 · Grade &amp; size</h2>
+      <div class="choices" id="gradeChoices" role="radiogroup" aria-label="Colour grade"></div>
+      <p class="hint" id="gradeHint"></p>
+      <div class="choices" id="sizeChoices" role="radiogroup" aria-label="Export size"></div>
+    </div>
+
+    <button id="export" type="button" class="export-btn">Export PNG</button>
+    <p id="status" role="status"></p>
+    <p class="fineprint">All art is original — no Rockstar Games logo, artwork or fonts. Sample photos were made with an image model for make.fun and are free to use.</p>
+  </section>
+
+  <section class="preview" aria-label="Live preview">
+    <canvas id="cover" width="1080" height="1080" aria-label="The cover preview"></canvas>
+    <p class="preview-note" id="previewNote">Live preview — 1080 x 1080</p>
+  </section>
+</main>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
