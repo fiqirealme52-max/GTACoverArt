@@ -1,0 +1,131 @@
+/* Neon Bay Cover Studio — dark neon editor theme. System fonts only. */
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  background: #12081f;
+  color: #f4eefc;
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.topbar {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 14px 24px;
+  background: linear-gradient(90deg, #2a0a4a, #7a0e5e 55%, #c22a2a);
+  border-bottom: 2px solid #ff2e88;
+}
+.brand { font: 900 24px/1 "Arial Black", Arial, sans-serif; letter-spacing: 1px; }
+.brand em { font: 700 15px/1 system-ui, sans-serif; font-style: normal; color: #ffd166; letter-spacing: 3px; text-transform: uppercase; }
+.brand-mark {
+  display: inline-block;
+  background: #ffd166;
+  color: #16001f;
+  border-radius: 6px;
+  padding: 3px 7px;
+  margin-right: 8px;
+  font-size: 18px;
+}
+.tagline { margin: 0; color: #ffd9ec; font-size: 13px; }
+
+.app { display: flex; gap: 28px; align-items: flex-start; padding: 22px 24px 32px; }
+.controls { width: 330px; flex: none; display: flex; flex-direction: column; gap: 18px; }
+.group {
+  background: #1e0f31;
+  border: 1px solid #3d1a5c;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.group h2 { margin: 0 0 8px; font: 900 14px/1.2 "Arial Black", Arial, sans-serif; letter-spacing: 1px; color: #ffd166; text-transform: uppercase; }
+.hint { margin: 6px 0 0; color: #b9a8d6; font-size: 13px; }
+
+.slot { border-top: 1px solid #3d1a5c; padding-top: 10px; margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.slot:first-of-type { border-top: 0; padding-top: 0; margin-top: 0; }
+.slot-name { font-weight: 700; color: #ff8ac2; }
+.thumb { width: 100%; max-height: 110px; object-fit: cover; border-radius: 8px; background: #160a24; display: block; }
+.thumb[src=""] { display: none; }
+.thumb:not([src]) { display: none; }
+.file-btn {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #3d1a5c;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+}
+.file-btn input { display: none; }
+.sample-row { display: flex; gap: 8px; }
+.mini {
+  flex: 1;
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  border: 1px solid #7a4dbb;
+  background: transparent;
+  color: #d9c2ff;
+  cursor: pointer;
+}
+.mini:hover { background: #2c1547; }
+
+.choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #7a4dbb;
+  background: transparent;
+  color: #e9dcff;
+  cursor: pointer;
+}
+.choice[aria-checked="true"] { background: #ff2e88; border-color: #ff2e88; color: #fff; }
+
+label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; margin-top: 10px; }
+label:first-child { margin-top: 0; }
+input[type="text"], select {
+  font: inherit;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid #7a4dbb;
+  background: #160a24;
+  color: #fff;
+}
+input[type="range"] { width: 100%; accent-color: #ff2e88; }
+
+.export-btn {
+  font: 900 17px/1 "Arial Black", Arial, sans-serif;
+  letter-spacing: 1px;
+  padding: 15px;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #ff2e88, #ff7a1a);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 24px rgba(255, 46, 136, 0.45);
+}
+.export-btn:hover { filter: brightness(1.12); }
+#status { margin: 0; color: #9be8a9; min-height: 1.2em; font-size: 13px; }
+.fineprint { margin: 0; color: #8d7aa8; font-size: 12px; }
+
+.preview { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; position: sticky; top: 16px; }
+#cover {
+  max-width: 100%;
+  max-height: calc(100vh - 150px);
+  width: auto;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px #3d1a5c;
+}
+.preview-note { margin: 0; color: #b9a8d6; font-size: 13px; }
+
+/* Screenshot scenes: cover alone fills the window, editor keeps the full page. */
+body.shot-cover .topbar, body.shot-cover .controls, body.shot-cover .preview-note { display: none; }
+body.shot-cover .app { padding: 0; }
+body.shot-cover .preview { position: static; }
+body.shot-cover #cover { max-height: 100vh; max-width: 100vw; border-radius: 0; box-shadow: none; }
