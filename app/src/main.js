@@ -6,7 +6,21 @@
 // uploaded anywhere. A `?shot=` query sets up a fixed scene for a screenshot
 // instead of the interactive editor (see ./shots.js).
 
-import { GRADES, LAYOUTS, SIZES, renderCover } from './cover.js';
+import {
+  DEFAULT_BILLING,
+  DEFAULT_CAST_ROLES,
+  DEFAULT_LOCATION,
+  DEFAULT_QUOTE,
+  DEFAULT_QUOTE_BY,
+  DEFAULT_SEAL,
+  DEFAULT_SEAL_SUB,
+  DEFAULT_TAGLINE,
+  DEFAULT_VOLUME,
+  GRADES,
+  LAYOUTS,
+  SIZES,
+  renderCover,
+} from './cover.js';
 import { runShot } from './shots.js';
 
 const canvas = document.getElementById('cover');
@@ -24,6 +38,16 @@ const state = {
   captionStyle: 'block',
   photos: [null, null, null],
   crops: [],
+  // Movie-poster furniture (see cover.js for the defaults).
+  castRoles: [...DEFAULT_CAST_ROLES],
+  billing: DEFAULT_BILLING,
+  quote: DEFAULT_QUOTE,
+  quoteBy: DEFAULT_QUOTE_BY,
+  seal: DEFAULT_SEAL,
+  sealSub: DEFAULT_SEAL_SUB,
+  location: DEFAULT_LOCATION,
+  tagline: DEFAULT_TAGLINE,
+  volume: DEFAULT_VOLUME,
 };
 
 // Crops are kept per layout, so switching layouts does not lose a panel's crop.
@@ -197,6 +221,30 @@ document.getElementById('captionStyle').addEventListener('change', (e) => {
   render();
 });
 
+// Poster furniture controls.
+for (let i = 0; i < 4; i++) {
+  document.getElementById(`role${i}`).addEventListener('input', (e) => {
+    state.castRoles[i] = e.target.value;
+    render();
+  });
+}
+const furnitureFields = [
+  ['billing', 'billing'],
+  ['quote', 'quote'],
+  ['quoteBy', 'quoteBy'],
+  ['seal', 'seal'],
+  ['sealSub', 'sealSub'],
+  ['location', 'location'],
+  ['tagline', 'tagline'],
+  ['volume', 'volume'],
+];
+for (const [id, field] of furnitureFields) {
+  document.getElementById(id).addEventListener('input', (e) => {
+    state[field] = e.target.value;
+    render();
+  });
+}
+
 bindCropSlider('zoom', 'zoom');
 bindCropSlider('panX', 'panX');
 bindCropSlider('panY', 'panY');
@@ -249,6 +297,12 @@ if (shot) {
       document.getElementById('captionPos').value = state.captionPos;
       document.getElementById('captionStyle').value = state.captionStyle;
       document.getElementById('captionSize').value = String(state.captionSize);
+      for (let i = 0; i < 4; i++) {
+        document.getElementById(`role${i}`).value = state.castRoles[i] ?? '';
+      }
+      for (const [id, field] of furnitureFields) {
+        document.getElementById(id).value = state[field] ?? '';
+      }
       refreshChoices();
       render();
     },
