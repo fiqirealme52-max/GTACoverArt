@@ -31,6 +31,19 @@ export async function runShot(shot, query, api) {
   take('grade', 'grade');
   take('style', 'captionStyle');
   take('pos', 'captionPos');
+  // Poster furniture: roles is a comma-separated list, one role per panel.
+  const roles = query.get('roles');
+  if (roles !== null && roles !== '') {
+    patch.castRoles = roles.split(',').map((r) => r.trim().toUpperCase());
+  }
+  take('billing', 'billing');
+  take('quote', 'quote');
+  take('quoteby', 'quoteBy');
+  take('seal', 'seal');
+  take('sealsub', 'sealSub');
+  take('loc', 'location');
+  take('tagline', 'tagline');
+  take('vol', 'volume');
   const captionSize = query.get('captionSize');
   if (captionSize !== null && captionSize !== '') {
     patch.captionSize = Number(captionSize);
