@@ -24,13 +24,30 @@ export const LAYOUTS = [
   { id: 'duo', label: 'Duo split', hint: 'Two photos, one diagonal split' },
   { id: 'quad', label: 'Four grid', hint: 'Four panels, classic poster grid' },
   { id: 'single', label: 'Single photo', hint: 'One photo, full bleed' },
+  { id: 'hero', label: 'Pop-out hero', hint: 'One big portrait bursts out of the grid' },
+  { id: 'strip', label: 'Film strip', hint: 'Three stacked strips, diagonal cuts' },
 ];
 
 export const GRADES = [
   { id: 'sunset', label: 'Vice Sunset', hint: 'Blazing pink-orange dusk, striped sun, palm silhouettes' },
   { id: 'neon', label: 'Neon Nights', hint: 'Cyan and magenta night glow, lit skyline' },
   { id: 'noir', label: 'Noir', hint: 'High-contrast black and white, halftone print' },
+  { id: 'gold', label: 'Golden Hour', hint: 'Warm amber light, glowing sun, golden skyline' },
+  { id: 'dusk', label: 'Purple Dusk', hint: 'Violet dusk sky, early stars, cool skyline' },
 ];
+
+// Poster furniture defaults: the movie-poster dressing that makes a panel app
+// read as a film poster. Every field is editable in the editor.
+export const DEFAULT_CAST_ROLES = ['THE INSIDER', 'THE BOSS', 'THE RIDER', 'THE DRIVER'];
+export const DEFAULT_BILLING =
+  'A SUNSET PICTURES PRODUCTION · STARRING YOU · SHOT ON YOUR OWN CAMERA · GRADED BY HAND';
+export const DEFAULT_QUOTE = 'PURE GOLDEN-HOUR MAYHEM';
+export const DEFAULT_QUOTE_BY = 'THE HARBOR GAZETTE';
+export const DEFAULT_SEAL = 'ORIGINAL COVER ART';
+export const DEFAULT_SEAL_SUB = "HOT SUMMER '26";
+export const DEFAULT_LOCATION = 'CORAL CAUSEWAY · 7:15 PM';
+export const DEFAULT_TAGLINE = 'FIVE FRIENDS · ONE COAST · NO WAY BACK';
+export const DEFAULT_VOLUME = 'VOL. 1';
 
 // Panel shapes as fractions of the cover (x, y from 0..1), with the photo slot
 // each panel shows. The slants give the poster its comic-book diagonal cuts.
@@ -54,6 +71,19 @@ const PANEL_SHAPES = {
     { points: [[0.56, 0], [1, 0], [1, 0.44], [0.44, 0.56]], slot: 1 },
     { points: [[0, 0.5], [0.44, 0.56], [0.56, 1], [0, 1]], slot: 2 },
     { points: [[0.44, 0.56], [1, 0.44], [1, 1], [0.56, 1]], slot: 0 },
+  ],
+  hero: [
+    // The grid behind the pop-out hero: same bones as triple, the hero
+    // portrait (drawn later, on top) bursts out of the middle of it.
+    { points: [[0, 0], [0.62, 0], [0.44, 1], [0, 1]], slot: 0 },
+    { points: [[0.62, 0], [1, 0], [1, 0.46], [0.53, 0.54]], slot: 1 },
+    { points: [[0.53, 0.54], [1, 0.46], [1, 1], [0.44, 1]], slot: 2 },
+  ],
+  strip: [
+    // Three horizontal film strips, each seam slanting the other way.
+    { points: [[0, 0], [1, 0], [1, 0.3], [0, 0.38]], slot: 0 },
+    { points: [[0, 0.38], [1, 0.3], [1, 0.66], [0, 0.7]], slot: 1 },
+    { points: [[0, 0.7], [1, 0.66], [1, 1], [0, 1]], slot: 2 },
   ],
 };
 
@@ -87,6 +117,8 @@ const GRADE_FILTER = {
   sunset: 'saturate(1.45) contrast(1.1) brightness(1.03) sepia(0.18)',
   neon: 'saturate(1.75) contrast(1.16) hue-rotate(-10deg) brightness(0.97)',
   noir: 'grayscale(1) contrast(1.25) brightness(1.05)',
+  gold: 'saturate(1.35) contrast(1.06) brightness(1.06) sepia(0.38)',
+  dusk: 'saturate(1.25) contrast(1.12) hue-rotate(14deg) brightness(0.94)',
 };
 
 function tracePath(ctx, points) {
@@ -365,6 +397,58 @@ function applyGrade(ctx, w, h, grade) {
     drawHalftone(ctx, w, h, '#00e5ff', 0.16);
     drawSkyline(ctx, w, h, 'rgba(8, 0, 24, 0.94)', '#00e5ff');
     drawVignette(ctx, w, h, 0.54);
+  } else if (grade === 'gold') {
+    // Golden hour: warm amber light from the top, a honeyed glow low down,
+    // the striped sun doing the same job it does at sunset.
+    const sky = ctx.createLinearGradient(0, 0, 0, h * 0.5);
+    sky.addColorStop(0, 'rgba(255, 190, 60, 0.34)');
+    sky.addColorStop(0.6, 'rgba(255, 150, 40, 0.16)');
+    sky.addColorStop(1, 'rgba(255, 150, 40, 0)');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, w, h * 0.5);
+    drawStripedSun(ctx, w, h);
+    const wash = ctx.createLinearGradient(0, h * 0.45, 0, h);
+    wash.addColorStop(0, 'rgba(255, 170, 50, 0)');
+    wash.addColorStop(0.6, 'rgba(255, 140, 30, 0.3)');
+    wash.addColorStop(1, 'rgba(160, 70, 10, 0.5)');
+    ctx.fillStyle = wash;
+    ctx.fillRect(0, 0, w, h);
+    drawPalm(ctx, w * 0.015, h * 0.995, Math.min(w, h) * 0.3, 0.15, 'rgba(40, 16, 2, 0.94)');
+    drawPalm(ctx, w * 0.985, h * 0.995, Math.min(w, h) * 0.24, -0.2, 'rgba(40, 16, 2, 0.94)');
+    drawHalftone(ctx, w, h, '#ffb84d', 0.13);
+    drawSkyline(ctx, w, h, 'rgba(30, 12, 2, 0.92)', '#ffb84d');
+    drawVignette(ctx, w, h, 0.42);
+  } else if (grade === 'dusk') {
+    // Purple dusk: the sun has gone, the sky is violet, the first stars are
+    // out and the city lights are just coming on.
+    const sky = ctx.createLinearGradient(0, 0, 0, h * 0.6);
+    sky.addColorStop(0, 'rgba(48, 16, 96, 0.5)');
+    sky.addColorStop(0.55, 'rgba(120, 40, 160, 0.3)');
+    sky.addColorStop(1, 'rgba(255, 80, 140, 0.12)');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, w, h * 0.6);
+    // Early stars, deterministic so the export stays identical every time.
+    ctx.fillStyle = '#ffffff';
+    for (let i = 0; i < 70; i++) {
+      const sx = ((i * 97 + 31) % 100) / 100 * w;
+      const sy = ((i * 53 + 17) % 100) / 100 * h * 0.34;
+      const sr = 1 + ((i * 7) % 3) * 0.6;
+      ctx.globalAlpha = 0.35 + ((i * 13) % 10) / 10 * 0.55;
+      ctx.beginPath();
+      ctx.arc(sx, sy, Math.max(1, w * 0.0011 * sr), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    const wash = ctx.createLinearGradient(0, h * 0.4, 0, h);
+    wash.addColorStop(0, 'rgba(90, 30, 150, 0)');
+    wash.addColorStop(0.6, 'rgba(90, 30, 150, 0.28)');
+    wash.addColorStop(1, 'rgba(20, 4, 48, 0.55)');
+    ctx.fillStyle = wash;
+    ctx.fillRect(0, 0, w, h);
+    drawPalm(ctx, w * 0.985, h * 0.995, Math.min(w, h) * 0.24, -0.2, 'rgba(14, 2, 34, 0.94)');
+    drawHalftone(ctx, w, h, '#b06cff', 0.14);
+    drawSkyline(ctx, w, h, 'rgba(12, 2, 30, 0.94)', '#c9a7ff');
+    drawVignette(ctx, w, h, 0.5);
   } else {
     const light = ctx.createLinearGradient(0, 0, 0, h * 0.4);
     light.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
@@ -401,7 +485,10 @@ function captionFont(ctx, text, size, maxWidth, tracking) {
  *  type, with its sub-caption above it. */
 function drawCaption(ctx, state, w, h) {
   const text = (state.caption || '').trim().toUpperCase();
-  const sub = (state.subcaption || '').trim().toUpperCase();
+  // The script sub-title keeps the user's own casing ("one last summer");
+  // every other style prints the sub-caption in caps.
+  const sub = (state.subcaption || '').trim();
+  const subCaps = sub.toUpperCase();
   const atBottom = state.captionPos !== 'top';
   if (!text && !sub) return;
 
@@ -423,7 +510,9 @@ function drawCaption(ctx, state, w, h) {
 
   const baseSize = h * 0.115 * (state.captionSize ?? 1);
   const size = text ? captionFont(ctx, text, baseSize, w * 0.88) : 0;
-  const baseline = atBottom ? h - h * 0.075 : h * 0.17;
+  // The baseline sits a little higher than before: the tagline strip and the
+  // billing block now live below the title, at the very foot of the poster.
+  const baseline = atBottom ? h - h * 0.1 : h * 0.17;
   const subSize = Math.max(14, Math.round(h * 0.032));
 
   ctx.save();
@@ -442,29 +531,57 @@ function drawCaption(ctx, state, w, h) {
   }
 
   if (sub) {
-    ctx.font = `700 ${subSize}px "Arial Black", Impact, Arial, sans-serif`;
-    try {
-      ctx.letterSpacing = `${Math.max(2, Math.round(subSize * 0.28))}px`;
-    } catch { /* see above */ }
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
-    ctx.lineWidth = Math.max(2, subSize * 0.14);
     const subY = atBottom ? -size * 0.92 : size * 0.95;
-    ctx.strokeText(`★ ${sub} ★`, 0, subY);
-    ctx.fillStyle = '#ffd166';
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-    ctx.shadowBlur = subSize * 0.3;
-    ctx.fillText(`★ ${sub} ★`, 0, subY);
-    ctx.shadowBlur = 0;
-    // A diagonal neon slash above the sub-caption — the poster's speed line,
-    // pink melting into orange, fading at both ends.
-    const slashY = atBottom ? subY - subSize * 2.1 : subY + subSize * 2.1;
-    const slashGrad = ctx.createLinearGradient(-w * 0.35, 0, w * 0.35, 0);
-    slashGrad.addColorStop(0, 'rgba(255, 46, 136, 0)');
-    slashGrad.addColorStop(0.5, 'rgba(255, 46, 136, 0.95)');
-    slashGrad.addColorStop(1, 'rgba(255, 122, 26, 0)');
-    ctx.fillStyle = slashGrad;
-    ctx.fillRect(-w * 0.35, slashY - Math.max(2, subSize * 0.09), w * 0.7, Math.max(4, subSize * 0.18));
+    if (state.captionStyle === 'chrome') {
+      // Script sub-title: an italic serif swash under the chrome title, the
+      // way a film poster pairs a metal logo with a handwritten tagline.
+      // (No script font ships with the app — Georgia italic is the offline
+      // stand-in, with a flourish underline to sell the handwriting.)
+      const scriptSize = Math.round(subSize * 1.25);
+      ctx.font = `italic 700 ${scriptSize}px Georgia, "Times New Roman", serif`;
+      try {
+        ctx.letterSpacing = '0px';
+      } catch { /* see above */ }
+      ctx.lineJoin = 'round';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
+      ctx.shadowBlur = scriptSize * 0.25;
+      ctx.fillStyle = '#ffd166';
+      // The script line rides higher than the block sub-caption, so its
+      // flourish underline clears the top of the chrome title.
+      const chromeY = atBottom ? -size * 1.02 : size * 1.02;
+      ctx.fillText(sub, 0, chromeY);
+      ctx.shadowBlur = 0;
+      const sw = ctx.measureText(sub).width;
+      ctx.strokeStyle = 'rgba(255, 209, 102, 0.9)';
+      ctx.lineWidth = Math.max(1.5, scriptSize * 0.05);
+      ctx.beginPath();
+      ctx.moveTo(-sw * 0.55, chromeY + scriptSize * 0.38);
+      ctx.quadraticCurveTo(0, chromeY + scriptSize * 0.55, sw * 0.62, chromeY + scriptSize * 0.3);
+      ctx.stroke();
+    } else {
+      ctx.font = `700 ${subSize}px "Arial Black", Impact, Arial, sans-serif`;
+      try {
+        ctx.letterSpacing = `${Math.max(2, Math.round(subSize * 0.28))}px`;
+      } catch { /* see above */ }
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
+      ctx.lineWidth = Math.max(2, subSize * 0.14);
+      ctx.strokeText(`★ ${subCaps} ★`, 0, subY);
+      ctx.fillStyle = '#ffd166';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+      ctx.shadowBlur = subSize * 0.3;
+      ctx.fillText(`★ ${subCaps} ★`, 0, subY);
+      ctx.shadowBlur = 0;
+      // A diagonal neon slash above the sub-caption — the poster's speed line,
+      // pink melting into orange, fading at both ends.
+      const slashY = atBottom ? subY - subSize * 2.1 : subY + subSize * 2.1;
+      const slashGrad = ctx.createLinearGradient(-w * 0.35, 0, w * 0.35, 0);
+      slashGrad.addColorStop(0, 'rgba(255, 46, 136, 0)');
+      slashGrad.addColorStop(0.5, 'rgba(255, 46, 136, 0.95)');
+      slashGrad.addColorStop(1, 'rgba(255, 122, 26, 0)');
+      ctx.fillStyle = slashGrad;
+      ctx.fillRect(-w * 0.35, slashY - Math.max(2, subSize * 0.09), w * 0.7, Math.max(4, subSize * 0.18));
+    }
   }
 
   if (text) {
@@ -516,6 +633,57 @@ function drawCaption(ctx, state, w, h) {
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
       ctx.lineWidth = Math.max(1, size * 0.018);
       ctx.strokeText(text, 0, 0);
+    } else if (state.captionStyle === 'chrome') {
+      // 3D chrome: the title is painted on its own layer — a vertical chrome
+      // gradient (bright, dark, bright again), then horizontal pinstripe
+      // lines clipped to the letters, then a fat black keyline and a thin
+      // gold sticker line. The layer is drawn back under the poster's
+      // squeeze-and-tilt transform, so the chrome reads as poster type.
+      const layer = document.createElement('canvas');
+      layer.width = Math.ceil(w * 0.94);
+      layer.height = Math.ceil(size * 1.7);
+      const lc = layer.getContext('2d');
+      lc.font = `900 ${Math.round(size)}px "Arial Black", Impact, "Helvetica Neue", Arial, sans-serif`;
+      lc.textAlign = 'center';
+      lc.textBaseline = 'alphabetic';
+      try {
+        lc.letterSpacing = `${Math.max(0, Math.round(size * 0.01))}px`;
+      } catch { /* letterSpacing is not supported everywhere */ }
+      const tx = layer.width / 2;
+      const ty = size * 1.15;
+      // Mostly bright metal: white and silver with one narrow mid-grey band,
+      // so the letters stay luminous on the dark title band. (An earlier,
+      // darker chrome read as hollow outline letters on the poster.)
+      const chrome = lc.createLinearGradient(0, ty - size * 0.78, 0, ty + size * 0.22);
+      chrome.addColorStop(0, '#ffffff');
+      chrome.addColorStop(0.28, '#f4f6fa');
+      chrome.addColorStop(0.45, '#cdd3de');
+      chrome.addColorStop(0.58, '#ffffff');
+      chrome.addColorStop(0.72, '#aeb6c6');
+      chrome.addColorStop(1, '#e8ecf2');
+      lc.fillStyle = chrome;
+      lc.fillText(text, tx, ty);
+      // Pinstripes clipped to the letters: thin dark lines across the metal.
+      lc.globalCompositeOperation = 'source-atop';
+      const stripeStep = Math.max(3, size * 0.085);
+      for (let y = 0; y < layer.height; y += stripeStep) {
+        lc.fillStyle = 'rgba(18, 22, 38, 0.16)';
+        lc.fillRect(0, y, layer.width, Math.max(1, size * 0.022));
+      }
+      lc.globalCompositeOperation = 'source-over';
+      lc.lineJoin = 'round';
+      lc.strokeStyle = '#16001f';
+      lc.lineWidth = Math.max(3, size * 0.09);
+      lc.strokeText(text, tx, ty);
+      lc.strokeStyle = 'rgba(255, 209, 102, 0.95)';
+      lc.lineWidth = Math.max(1.5, size * 0.032);
+      lc.strokeText(text, tx, ty);
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
+      ctx.shadowBlur = size * 0.12;
+      ctx.shadowOffsetY = size * 0.03;
+      ctx.drawImage(layer, -layer.width / 2, -size * 1.15);
+      ctx.shadowOffsetY = 0;
+      ctx.shadowBlur = 0;
     } else {
       // Block: a hot-pink echo behind the letters, then a fat black keyline
       // and a white face — the sticker look of a GTA poster title.
@@ -535,6 +703,347 @@ function drawCaption(ctx, state, w, h) {
   try {
     ctx.letterSpacing = '0px';
   } catch { /* see above */ }
+  // The furniture pass needs the title's geometry (where the quote and the
+  // tagline sit relative to the title), so hand it back.
+  return { size, baseline, atBottom };
+}
+
+/** A rounded rectangle path (ctx.roundRect is not everywhere yet). */
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+/** One character at a time along a circular arc.
+ *  Top arc (flip false): letters stand on the circle, tops outward.
+ *  Bottom arc (flip true): letters hang from the circle, tops inward, so the
+ *  word still reads left to right. Angles are canvas angles (0 = east). */
+function drawArcText(ctx, text, cx, cy, radius, a0, a1, flip) {
+  const chars = [...text];
+  const n = chars.length;
+  for (let i = 0; i < n; i++) {
+    const t = n === 1 ? 0.5 : i / (n - 1);
+    const a = a0 + (a1 - a0) * t;
+    ctx.save();
+    ctx.translate(cx + Math.cos(a) * radius, cy + Math.sin(a) * radius);
+    ctx.rotate(flip ? a - Math.PI / 2 : a + Math.PI / 2);
+    ctx.fillText(chars[i], 0, 0);
+    ctx.restore();
+  }
+}
+
+/** The gold seal: a sticker-like medallion, tilted, overlapping the poster's
+ *  right side. Top arc = first word of the seal text, centre = the rest,
+ *  bottom arc = the seal's second line (e.g. "HOT SUMMER '26"). */
+function drawSeal(ctx, state, w, h) {
+  const cx = w * 0.9;
+  const cy = h * 0.6;
+  const r = Math.min(w, h) * 0.055;
+  const sealText = (state.seal || 'ORIGINAL COVER ART').trim().toUpperCase();
+  const sealSub = (state.sealSub || "HOT SUMMER '26").trim().toUpperCase();
+  const words = sealText.split(/\s+/).filter(Boolean);
+  const topWord = words[0] ?? 'ORIGINAL';
+  const centerWords = words.slice(1);
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(-0.12);
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+  ctx.shadowBlur = r * 0.25;
+  ctx.shadowOffsetY = r * 0.06;
+  const gold = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
+  gold.addColorStop(0, '#f9e08a');
+  gold.addColorStop(0.55, '#e3b83a');
+  gold.addColorStop(1, '#a87c14');
+  ctx.fillStyle = gold;
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+  ctx.strokeStyle = '#6d4c05';
+  ctx.lineWidth = Math.max(1.5, r * 0.045);
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 0.97, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.lineWidth = Math.max(1, r * 0.03);
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 0.74, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = '#3d2c02';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const arcSize = Math.max(9, r * 0.16);
+  ctx.font = `900 ${Math.round(arcSize)}px "Arial Black", Impact, Arial, sans-serif`;
+  drawArcText(ctx, `★ ${topWord} ★`, 0, 0, r * 0.86, -Math.PI + 0.55, -0.55, false);
+  const centerText = centerWords.join(' ');
+  const centerSize = Math.max(10, r * (centerText.length > 8 ? 0.17 : 0.21));
+  ctx.font = `900 ${Math.round(centerSize)}px "Arial Black", Impact, Arial, sans-serif`;
+  const mid = Math.ceil(centerWords.length / 2);
+  const line1 = centerWords.slice(0, mid).join(' ');
+  const line2 = centerWords.slice(mid).join(' ');
+  if (line2) {
+    ctx.fillText(line1, 0, -centerSize * 0.55);
+    ctx.fillText(line2, 0, centerSize * 0.55);
+  } else {
+    ctx.fillText(line1, 0, 0);
+  }
+  const subSize = Math.max(8, r * 0.13);
+  ctx.font = `900 ${Math.round(subSize)}px "Arial Black", Impact, Arial, sans-serif`;
+  drawArcText(ctx, sealSub, 0, 0, r * 0.86, Math.PI - 0.55, 0.55, true);
+  ctx.restore();
+}
+
+/** One cast-role pill: a dark pill with a gold keyline and gold caps text,
+ *  riding the top edge of a panel (or of the hero portrait). */
+function drawRoleTag(ctx, box, role, w, yOffset = 0) {
+  let size = Math.max(11, Math.min(w * 0.016, box.w * 0.075, box.h * 0.1));
+  ctx.font = `900 ${Math.round(size)}px "Arial Black", Impact, Arial, sans-serif`;
+  try {
+    ctx.letterSpacing = `${Math.max(1, Math.round(size * 0.14))}px`;
+  } catch { /* see drawCaption */ }
+  const padX = size * 0.7;
+  while (size > 9 && ctx.measureText(role).width + padX * 2 > box.w * 0.92) {
+    size -= 1;
+    ctx.font = `900 ${Math.round(size)}px "Arial Black", Impact, Arial, sans-serif`;
+  }
+  const tw = ctx.measureText(role).width;
+  const pillW = tw + padX * 2;
+  const pillH = size * 1.9;
+  const cx = box.x + box.w / 2;
+  const y = box.y + Math.max(4, box.h * 0.03) + yOffset;
+  ctx.save();
+  ctx.fillStyle = 'rgba(16, 0, 30, 0.88)';
+  ctx.strokeStyle = '#ffd166';
+  ctx.lineWidth = Math.max(1, size * 0.09);
+  roundRect(ctx, cx - pillW / 2, y, pillW, pillH, pillH / 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#ffd166';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(role, cx, y + pillH / 2 + size * 0.04);
+  ctx.restore();
+  try {
+    ctx.letterSpacing = '0px';
+  } catch { /* see drawCaption */ }
+}
+
+/** A role pill on every panel. In hero mode the portrait takes the first
+ *  role and the grid panels take the next three, so no role repeats. */
+function drawCastTags(ctx, panels, roles, w, h, heroMode) {
+  const list = roles && roles.length ? roles : DEFAULT_CAST_ROLES;
+  panels.forEach((panel, i) => {
+    const role = (list[heroMode ? i + 1 : i] ?? '').trim().toUpperCase();
+    if (!role) return;
+    // Panels that start at the very top of the cover share the top band with
+    // the location callout — push their pills below that line.
+    const topPush = panel.box.y < h * 0.08 ? Math.max(14, h * 0.028) : 0;
+    drawRoleTag(ctx, panel.box, role, w, topPush);
+  });
+}
+
+/** The pop-out hero: one big portrait, tilted a touch, pasted over the grid
+ *  with a white keyline and a drop shadow, carrying the first cast role. */
+function drawHero(ctx, state, w, h) {
+  const img = state.photos[0] ?? null;
+  const crop = (state.crops && state.crops[0]) ?? { zoom: 1, panX: 0, panY: 0 };
+  const bw = w * 0.46;
+  const bh = h * 0.6;
+  const bx = w * 0.27;
+  const by = h * 0.12;
+  const cx = bx + bw / 2;
+  const cy = by + bh / 2;
+  const ang = -0.02;
+  const cos = Math.cos(ang);
+  const sin = Math.sin(ang);
+  const corners = [[bx, by], [bx + bw, by], [bx + bw, by + bh], [bx, by + bh]].map(([x, y]) => {
+    const dx = x - cx;
+    const dy = y - cy;
+    return [cx + dx * cos - dy * sin, cy + dx * sin + dy * cos];
+  });
+  // The photo box is padded a few pixels past the portrait, so the rotated
+  // corners are fully covered by the photo instead of showing the background.
+  const panel = {
+    points: corners,
+    slot: 0,
+    zoom: (crop.zoom ?? 1) * 1.25,
+    panX: crop.panX ?? 0,
+    panY: crop.panY ?? 0,
+    box: { x: bx - 6, y: by - 6, w: bw + 12, h: bh + 12 },
+  };
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  ctx.shadowBlur = Math.max(10, w * 0.02);
+  ctx.shadowOffsetY = Math.max(6, w * 0.008);
+  drawPhotoPanel(ctx, panel, img, state.grade);
+  ctx.restore();
+  ctx.save();
+  ctx.lineJoin = 'round';
+  tracePath(ctx, corners);
+  ctx.strokeStyle = '#12001e';
+  ctx.lineWidth = Math.max(4, w * 0.008);
+  ctx.stroke();
+  tracePath(ctx, corners);
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = Math.max(3, w * 0.005);
+  ctx.stroke();
+  ctx.restore();
+  const roles = state.castRoles && state.castRoles.length ? state.castRoles : DEFAULT_CAST_ROLES;
+  const role = (roles[0] ?? '').trim().toUpperCase();
+  if (role) drawRoleTag(ctx, { x: bx, y: by, w: bw, h: bh }, role, w);
+}
+
+/** The rest of the movie-poster dressing, drawn after the caption so it sits
+ *  on top of everything: the location/time callout and volume (top), the
+ *  five-star quote (above or below the title), the tagline strip, the billing
+ *  block with its barcode (foot), and the gold seal. */
+function drawPosterFurniture(ctx, state, w, h, title) {
+  const frame = Math.max(6, Math.round(w * 0.008));
+  const gold = '#ffd166';
+  const loc = (state.location || '').trim().toUpperCase();
+  const vol = (state.volume || '').trim().toUpperCase();
+  const tagline = (state.tagline || '').trim().toUpperCase();
+  const quote = (state.quote || '').trim();
+  const quoteBy = (state.quoteBy || '').trim().toUpperCase();
+  const billing = (state.billing || '').trim();
+  const size = title.size || 0;
+  const baseline = title.baseline;
+  const atBottom = title.atBottom;
+
+  ctx.save();
+
+  // 1. Location + time callout (top-left) and volume (top-right).
+  const callSize = Math.max(12, Math.round(h * 0.016));
+  ctx.font = `900 ${callSize}px "Arial Black", Impact, Arial, sans-serif`;
+  try {
+    ctx.letterSpacing = `${Math.max(1, Math.round(callSize * 0.16))}px`;
+  } catch { /* see drawCaption */ }
+  const callY = frame + callSize * 1.4;
+  if (loc) {
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = '#ff2e88';
+    ctx.fillText('◆', frame + 10, callY);
+    ctx.fillStyle = gold;
+    ctx.fillText(loc, frame + 10 + callSize * 1.6, callY);
+  }
+  if (vol) {
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = gold;
+    ctx.fillText(vol, w - frame - 10, callY);
+    const vw = ctx.measureText(vol).width;
+    ctx.fillRect(w - frame - 10 - vw, callY + callSize * 0.35, vw, Math.max(1.5, callSize * 0.08));
+  }
+
+  // 2. Five-star quote, just above the title (or just below it, top mode).
+  // It sits well clear of the script sub-title, whose tall ascenders used
+  // to brush the quote line.
+  if (quote) {
+    const quoteY = atBottom ? baseline - size * 1.62 : baseline + size * 1.62;
+    const starSize = Math.max(12, Math.round(h * 0.02));
+    const quoteSize = Math.max(13, Math.round(h * 0.021));
+    const bySize = Math.max(10, Math.round(h * 0.0135));
+    ctx.font = `900 ${starSize}px "Arial Black", Impact, Arial, sans-serif`;
+    const starsW = ctx.measureText('★★★★★ ').width;
+    ctx.font = `italic 700 ${quoteSize}px Georgia, "Times New Roman", serif`;
+    const quoteW = ctx.measureText(`“${quote}”`).width;
+    ctx.font = `900 ${bySize}px "Arial Black", Impact, Arial, sans-serif`;
+    const byW = quoteBy ? ctx.measureText(` — ${quoteBy}`).width : 0;
+    let x = w / 2 - (starsW + quoteW + byW) / 2;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.font = `900 ${starSize}px "Arial Black", Impact, Arial, sans-serif`;
+    ctx.fillStyle = gold;
+    ctx.fillText('★★★★★ ', x, quoteY);
+    x += starsW;
+    ctx.font = `italic 700 ${quoteSize}px Georgia, "Times New Roman", serif`;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(`“${quote}”`, x, quoteY);
+    x += quoteW;
+    if (quoteBy) {
+      ctx.font = `900 ${bySize}px "Arial Black", Impact, Arial, sans-serif`;
+      try {
+        ctx.letterSpacing = `${Math.max(1, Math.round(bySize * 0.18))}px`;
+      } catch { /* see drawCaption */ }
+      ctx.fillStyle = gold;
+      ctx.fillText(` — ${quoteBy}`, x, quoteY);
+    }
+  }
+
+  // 3. Tagline strip: spaced caps between the title and the billing block.
+  if (tagline) {
+    const tagY = atBottom ? h * 0.94 : baseline + size * 2.0;
+    const tagSize = Math.max(12, Math.round(h * 0.017));
+    ctx.font = `900 ${tagSize}px "Arial Black", Impact, Arial, sans-serif`;
+    try {
+      ctx.letterSpacing = `${Math.max(2, Math.round(tagSize * 0.3))}px`;
+    } catch { /* see drawCaption */ }
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(tagline, w / 2, tagY);
+  }
+
+  // 4. Billing block: a solid credit strip at the very foot, barcode at right.
+  if (billing) {
+    const stripTop = h * 0.955;
+    const stripH = h * 0.04;
+    ctx.fillStyle = '#0a0014';
+    ctx.fillRect(frame, stripTop, w - frame * 2, stripH);
+    ctx.strokeStyle = 'rgba(255, 209, 102, 0.5)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(frame, stripTop);
+    ctx.lineTo(w - frame, stripTop);
+    ctx.stroke();
+    const barcodeW = Math.max(50, w * 0.085);
+    const barcodeH = stripH * 0.62;
+    const bx = w - frame - 10 - barcodeW;
+    const by = stripTop + (stripH - barcodeH) / 2;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(bx, by, barcodeW, barcodeH);
+    // Deterministic bars: a fixed pseudo-random pattern, so every export
+    // carries the same barcode.
+    ctx.fillStyle = '#0a0014';
+    let px = bx + 3;
+    let i = 0;
+    while (px < bx + barcodeW - 4) {
+      const bw2 = 1 + ((i * 37) % 4);
+      if ((i * 11) % 3 !== 0) ctx.fillRect(px, by + 2, bw2, barcodeH - 4);
+      px += bw2 + 1 + ((i * 7) % 3);
+      i++;
+    }
+    // Billing text, shrunk until it fits the space left of the barcode.
+    let billSize = Math.max(9, h * 0.0125);
+    const avail = bx - 12 - (frame + 12);
+    ctx.font = `700 ${Math.round(billSize)}px Arial, Helvetica, sans-serif`;
+    try {
+      ctx.letterSpacing = '1px';
+    } catch { /* see drawCaption */ }
+    while (billSize > 8 && ctx.measureText(billing).width > avail) {
+      billSize -= 0.5;
+      ctx.font = `700 ${Math.round(billSize)}px Arial, Helvetica, sans-serif`;
+    }
+    ctx.fillStyle = '#cfc4e8';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(billing, frame + 12, stripTop + stripH / 2 + billSize * 0.05);
+  }
+
+  // 5. The gold seal, overlapping the poster's right side like a sticker.
+  drawSeal(ctx, state, w, h);
+
+  ctx.restore();
+  try {
+    ctx.letterSpacing = '0px';
+  } catch { /* see drawCaption */ }
 }
 
 /**
@@ -605,6 +1114,14 @@ export function renderCover(canvas, state) {
     }
     ctx.restore();
   }
-  drawCaption(ctx, state, w, h);
+  // The pop-out hero bursts out of the grid, above the grade wash, so the
+  // portrait reads as a pasted photo on the poster.
+  if (state.layout === 'hero') {
+    drawHero(ctx, state, w, h);
+  }
+  const title = drawCaption(ctx, state, w, h);
+  // Cast-role pills on every panel, then the rest of the poster furniture.
+  drawCastTags(ctx, panels, state.castRoles, w, h, state.layout === 'hero');
+  drawPosterFurniture(ctx, state, w, h, title);
   return panels;
 }
