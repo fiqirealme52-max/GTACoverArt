@@ -39,19 +39,21 @@ const PANEL_SHAPES = {
     { points: [[0, 0], [1, 0], [1, 1], [0, 1]], slot: 0 },
   ],
   duo: [
-    { points: [[0, 0], [0.54, 0], [0.44, 1], [0, 1]], slot: 0 },
-    { points: [[0.54, 0], [1, 0], [1, 1], [0.44, 1]], slot: 1 },
+    { points: [[0, 0], [0.58, 0], [0.4, 1], [0, 1]], slot: 0 },
+    { points: [[0.58, 0], [1, 0], [1, 1], [0.4, 1]], slot: 1 },
   ],
   triple: [
-    { points: [[0, 0], [0.6, 0], [0.52, 1], [0, 1]], slot: 0 },
-    { points: [[0.6, 0], [1, 0], [1, 0.52], [0.558, 0.52]], slot: 1 },
-    { points: [[0.558, 0.52], [1, 0.52], [1, 1], [0.52, 1]], slot: 2 },
+    { points: [[0, 0], [0.62, 0], [0.44, 1], [0, 1]], slot: 0 },
+    { points: [[0.62, 0], [1, 0], [1, 0.46], [0.53, 0.54]], slot: 1 },
+    { points: [[0.53, 0.54], [1, 0.46], [1, 1], [0.44, 1]], slot: 2 },
   ],
   quad: [
-    { points: [[0, 0], [0.5, 0], [0.5, 0.5], [0, 0.5]], slot: 0 },
-    { points: [[0.5, 0], [1, 0], [1, 0.5], [0.5, 0.5]], slot: 1 },
-    { points: [[0, 0.5], [0.5, 0.5], [0.5, 1], [0, 1]], slot: 2 },
-    { points: [[0.5, 0.5], [1, 0.5], [1, 1], [0.5, 1]], slot: 0 },
+    // A slashed cross: both seams run diagonal, so even the grid reads as a
+    // comic-book cut instead of a plain four-square.
+    { points: [[0, 0], [0.56, 0], [0.44, 0.56], [0, 0.5]], slot: 0 },
+    { points: [[0.56, 0], [1, 0], [1, 0.44], [0.44, 0.56]], slot: 1 },
+    { points: [[0, 0.5], [0.44, 0.56], [0.56, 1], [0, 1]], slot: 2 },
+    { points: [[0.44, 0.56], [1, 0.44], [1, 1], [0.56, 1]], slot: 0 },
   ],
 };
 
@@ -139,21 +141,21 @@ function drawPhotoPanel(ctx, panel, img, grade) {
  *  horizontal slits cut through its lower half, drawn on its own layer so
  *  the slits reveal the sky wash instead of punching through the photos. */
 function drawStripedSun(ctx, w, h) {
-  // Small, tucked into the extreme top-right corner, and slightly
-  // transparent: an accent over the sky, never a disc hiding the photo's
-  // subject — a face behind it still shows through.
+  // Big and loud now — the sun is the poster's icon, not a corner accent.
+  // It sits in the extreme top-right, slightly transparent, so a face behind
+  // it still shows through, but at this size it reads from across the room.
   const cx = w * 0.93;
   const cy = h * 0.1;
-  const r = Math.min(w, h) * 0.1;
+  const r = Math.min(w, h) * 0.15;
   ctx.save();
-  ctx.globalAlpha = 0.8;
-  const glow = ctx.createRadialGradient(cx, cy, r * 0.1, cx, cy, r * 1.5);
-  glow.addColorStop(0, 'rgba(255, 247, 214, 0.85)');
-  glow.addColorStop(0.3, 'rgba(255, 190, 90, 0.45)');
-  glow.addColorStop(0.6, 'rgba(255, 80, 120, 0.2)');
+  ctx.globalAlpha = 0.9;
+  const glow = ctx.createRadialGradient(cx, cy, r * 0.1, cx, cy, r * 1.9);
+  glow.addColorStop(0, 'rgba(255, 247, 214, 0.9)');
+  glow.addColorStop(0.3, 'rgba(255, 190, 90, 0.55)');
+  glow.addColorStop(0.6, 'rgba(255, 80, 120, 0.28)');
   glow.addColorStop(1, 'rgba(255, 80, 120, 0)');
   ctx.fillStyle = glow;
-  ctx.fillRect(cx - r * 1.7, cy - r * 1.7, r * 3.4, r * 3.4);
+  ctx.fillRect(cx - r * 2, cy - r * 2, r * 4, r * 4);
 
   const layer = document.createElement('canvas');
   layer.width = Math.ceil(r * 2);
@@ -168,14 +170,14 @@ function drawStripedSun(ctx, w, h) {
   lc.beginPath();
   lc.arc(r, r, r, 0, Math.PI * 2);
   lc.fill();
-  // Slits through the lower half, widening as they fall.
+  // Slits through the lower half, widening as they fall — thick and punchy.
   lc.globalCompositeOperation = 'destination-out';
-  let y = r * 1.08;
-  let thick = Math.max(2, r * 0.03);
+  let y = r * 1.02;
+  let thick = Math.max(3, r * 0.045);
   while (y < r * 2) {
     lc.fillRect(0, y, r * 2, thick);
-    y += Math.max(6, r * 0.11);
-    thick *= 1.35;
+    y += Math.max(7, r * 0.1);
+    thick *= 1.45;
   }
   lc.globalCompositeOperation = 'source-over';
   ctx.drawImage(layer, cx - r, cy - r);
@@ -217,7 +219,8 @@ function drawPalm(ctx, x, y, s, lean, color) {
   ctx.fill();
 }
 
-/** A low dark city skyline strip hugging the very bottom edge, windows lit.
+/** A tall, varied city skyline strip hugging the bottom edge, windows lit,
+ *  with rooftop antennae and a few landmark towers — the Vice City horizon.
  *  It sits below the caption text, so the title never fights the buildings. */
 function drawSkyline(ctx, w, h, color, winColor) {
   const y0 = h * 0.995;
@@ -226,17 +229,35 @@ function drawSkyline(ctx, w, h, color, winColor) {
   ctx.fillStyle = color;
   while (x < w * 1.01) {
     const bw = w * (0.045 + ((i * 37) % 10) * 0.006);
-    const bh = h * (0.015 + ((i * 53) % 10) * 0.0023);
+    // Landmark towers every fifth building rise well above the rest.
+    const tall = i % 5 === 2;
+    const bh = h * (0.04 + ((i * 53) % 10) * 0.006) * (tall ? 1.9 : 1);
     ctx.fillRect(x, y0 - bh, bw, bh + h * 0.005);
-    // A few lit windows per building.
+    if (tall) {
+      // A second tier and an antenna with a lit beacon on top.
+      const tw = bw * 0.45;
+      ctx.fillRect(x + bw * 0.28, y0 - bh - h * 0.022, tw, h * 0.022);
+      ctx.fillRect(x + bw * 0.46, y0 - bh - h * 0.05, Math.max(2, w * 0.003), h * 0.03);
+      ctx.fillStyle = winColor;
+      ctx.globalAlpha = 0.95;
+      ctx.beginPath();
+      ctx.arc(x + bw * 0.475, y0 - bh - h * 0.052, Math.max(2, w * 0.0035), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = color;
+    } else if (i % 4 === 1) {
+      // A plain antenna on every fourth building.
+      ctx.fillRect(x + bw * 0.48, y0 - bh - h * 0.018, Math.max(2, w * 0.0025), h * 0.018);
+    }
+    // Lit windows, denser than before.
     ctx.fillStyle = winColor;
-    const cols = Math.max(1, Math.floor(bw / (w * 0.018)));
-    const rows = Math.max(1, Math.floor(bh / (h * 0.016)));
+    const cols = Math.max(2, Math.floor(bw / (w * 0.016)));
+    const rows = Math.max(2, Math.floor(bh / (h * 0.014)));
     for (let c = 0; c < cols; c++) {
       for (let r = 0; r < rows; r++) {
-        if ((i * 7 + c * 3 + r * 5) % 4 === 0) {
+        if ((i * 7 + c * 3 + r * 5) % 3 === 0) {
           ctx.globalAlpha = 0.55 + ((i + c + r) % 3) * 0.15;
-          ctx.fillRect(x + bw * 0.14 + c * bw * 0.68 / Math.max(1, cols - 1 || 1), y0 - bh + bh * 0.16 + r * bh * 0.68 / Math.max(1, rows - 1 || 1), Math.max(2, w * 0.004), Math.max(2, h * 0.005));
+          ctx.fillRect(x + bw * 0.12 + c * bw * 0.72 / Math.max(1, cols - 1 || 1), y0 - bh + bh * 0.12 + r * bh * 0.74 / Math.max(1, rows - 1 || 1), Math.max(2, w * 0.0045), Math.max(2, h * 0.006));
         }
       }
     }
@@ -255,7 +276,10 @@ function drawHalftone(ctx, w, h, color, alpha) {
   ctx.fillStyle = color;
   ctx.globalAlpha = alpha;
   for (let row = 0, y = spacing / 2; y < h; y += spacing, row++) {
-    const shade = 0.3 + 0.7 * (y / h);
+    // Dots grow hard toward the foot of the poster — the comic print reads
+    // loudest where the caption sits, and stays fine over the photos' faces.
+    const t = y / h;
+    const shade = 0.22 + 1.15 * t * t;
     const r = Math.max(0.8, spacing * 0.16 * shade * 2);
     for (let x = spacing / 2 + (row % 2 ? spacing / 2 : 0); x < w; x += spacing) {
       ctx.beginPath();
@@ -281,18 +305,26 @@ function drawVignette(ctx, w, h, strength) {
 /** The colour wash of the chosen grade, laid over the panels. */
 function applyGrade(ctx, w, h, grade) {
   if (grade === 'sunset') {
-    // Dusk sky washing down from the top: deep purple into hot pink.
+    // Dusk sky washing down from the top: deep purple into hot pink, much
+    // stronger than before so the whole poster glows Vice City.
     const sky = ctx.createLinearGradient(0, 0, 0, h * 0.55);
-    sky.addColorStop(0, 'rgba(43, 10, 78, 0.34)');
-    sky.addColorStop(0.45, 'rgba(255, 46, 136, 0.2)');
-    sky.addColorStop(1, 'rgba(255, 122, 26, 0.08)');
+    sky.addColorStop(0, 'rgba(43, 10, 78, 0.46)');
+    sky.addColorStop(0.45, 'rgba(255, 46, 136, 0.28)');
+    sky.addColorStop(1, 'rgba(255, 122, 26, 0.14)');
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, w, h * 0.55);
     drawStripedSun(ctx, w, h);
+    // A hot horizon glow band where the sky meets the city.
+    const horizon = ctx.createLinearGradient(0, h * 0.42, 0, h * 0.62);
+    horizon.addColorStop(0, 'rgba(255, 140, 40, 0)');
+    horizon.addColorStop(0.5, 'rgba(255, 110, 40, 0.22)');
+    horizon.addColorStop(1, 'rgba(255, 140, 40, 0)');
+    ctx.fillStyle = horizon;
+    ctx.fillRect(0, h * 0.42, w, h * 0.2);
     const wash = ctx.createLinearGradient(0, h * 0.4, 0, h);
     wash.addColorStop(0, 'rgba(255, 90, 40, 0)');
-    wash.addColorStop(0.55, 'rgba(255, 80, 40, 0.32)');
-    wash.addColorStop(1, 'rgba(180, 20, 110, 0.55)');
+    wash.addColorStop(0.55, 'rgba(255, 80, 40, 0.4)');
+    wash.addColorStop(1, 'rgba(180, 20, 110, 0.66)');
     ctx.fillStyle = wash;
     ctx.fillRect(0, 0, w, h);
     // Palm silhouettes peeking from the bottom corners, nearly upright so
@@ -300,46 +332,46 @@ function applyGrade(ctx, w, h, grade) {
     const ps = Math.min(w, h);
     drawPalm(ctx, w * 0.015, h * 0.995, ps * 0.3, 0.15, 'rgba(24, 2, 38, 0.94)');
     drawPalm(ctx, w * 0.985, h * 0.995, ps * 0.24, -0.2, 'rgba(24, 2, 38, 0.94)');
-    drawHalftone(ctx, w, h, '#ff2e88', 0.11);
+    drawHalftone(ctx, w, h, '#ff2e88', 0.16);
     drawSkyline(ctx, w, h, 'rgba(18, 0, 30, 0.92)', '#ffd166');
-    drawVignette(ctx, w, h, 0.42);
+    drawVignette(ctx, w, h, 0.46);
   } else if (grade === 'neon') {
     // Dusk first: push daylight photos toward night, then the neon washes.
     const dusk = ctx.createLinearGradient(0, 0, 0, h * 0.4);
-    dusk.addColorStop(0, 'rgba(10, 4, 40, 0.3)');
+    dusk.addColorStop(0, 'rgba(10, 4, 40, 0.38)');
     dusk.addColorStop(1, 'rgba(10, 4, 40, 0)');
     ctx.fillStyle = dusk;
     ctx.fillRect(0, 0, w, h * 0.4);
     const top = ctx.createLinearGradient(0, 0, 0, h * 0.5);
-    top.addColorStop(0, 'rgba(0, 229, 255, 0.28)');
+    top.addColorStop(0, 'rgba(0, 229, 255, 0.36)');
     top.addColorStop(1, 'rgba(0, 229, 255, 0)');
     ctx.fillStyle = top;
     ctx.fillRect(0, 0, w, h * 0.5);
     const bottom = ctx.createLinearGradient(0, h * 0.5, 0, h);
     bottom.addColorStop(0, 'rgba(255, 0, 170, 0)');
-    bottom.addColorStop(1, 'rgba(255, 0, 170, 0.36)');
+    bottom.addColorStop(1, 'rgba(255, 0, 170, 0.46)');
     ctx.fillStyle = bottom;
     ctx.fillRect(0, h * 0.5, w, h * 0.5);
     // Neon glow pooling in the corners.
     const pool = ctx.createRadialGradient(w * 0.85, h * 0.9, 0, w * 0.85, h * 0.9, w * 0.5);
-    pool.addColorStop(0, 'rgba(255, 0, 170, 0.3)');
+    pool.addColorStop(0, 'rgba(255, 0, 170, 0.38)');
     pool.addColorStop(1, 'rgba(255, 0, 170, 0)');
     ctx.fillStyle = pool;
     ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
     const step = Math.max(4, Math.round(h / 220));
     for (let y = 0; y < h; y += step * 2) ctx.fillRect(0, y, w, 1);
     drawPalm(ctx, w * 0.985, h * 0.995, Math.min(w, h) * 0.24, -0.2, 'rgba(10, 0, 26, 0.94)');
-    drawHalftone(ctx, w, h, '#00e5ff', 0.12);
+    drawHalftone(ctx, w, h, '#00e5ff', 0.16);
     drawSkyline(ctx, w, h, 'rgba(8, 0, 24, 0.94)', '#00e5ff');
-    drawVignette(ctx, w, h, 0.5);
+    drawVignette(ctx, w, h, 0.54);
   } else {
     const light = ctx.createLinearGradient(0, 0, 0, h * 0.4);
     light.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
     light.addColorStop(1, 'rgba(255, 255, 255, 0)');
     ctx.fillStyle = light;
     ctx.fillRect(0, 0, w, h * 0.4);
-    drawHalftone(ctx, w, h, '#000000', 0.15);
+    drawHalftone(ctx, w, h, '#000000', 0.19);
     drawSkyline(ctx, w, h, 'rgba(10, 10, 12, 0.9)', '#e8e8e8');
     drawVignette(ctx, w, h, 0.55);
   }
@@ -389,7 +421,7 @@ function drawCaption(ctx, state, w, h) {
     ctx.fillRect(0, 0, w, h * 0.48);
   }
 
-  const baseSize = h * 0.105 * (state.captionSize ?? 1);
+  const baseSize = h * 0.115 * (state.captionSize ?? 1);
   const size = text ? captionFont(ctx, text, baseSize, w * 0.88) : 0;
   const baseline = atBottom ? h - h * 0.075 : h * 0.17;
   const subSize = Math.max(14, Math.round(h * 0.032));
@@ -424,6 +456,15 @@ function drawCaption(ctx, state, w, h) {
     ctx.shadowBlur = subSize * 0.3;
     ctx.fillText(`★ ${sub} ★`, 0, subY);
     ctx.shadowBlur = 0;
+    // A diagonal neon slash above the sub-caption — the poster's speed line,
+    // pink melting into orange, fading at both ends.
+    const slashY = atBottom ? subY - subSize * 2.1 : subY + subSize * 2.1;
+    const slashGrad = ctx.createLinearGradient(-w * 0.35, 0, w * 0.35, 0);
+    slashGrad.addColorStop(0, 'rgba(255, 46, 136, 0)');
+    slashGrad.addColorStop(0.5, 'rgba(255, 46, 136, 0.95)');
+    slashGrad.addColorStop(1, 'rgba(255, 122, 26, 0)');
+    ctx.fillStyle = slashGrad;
+    ctx.fillRect(-w * 0.35, slashY - Math.max(2, subSize * 0.09), w * 0.7, Math.max(4, subSize * 0.18));
   }
 
   if (text) {
@@ -437,7 +478,7 @@ function drawCaption(ctx, state, w, h) {
     if (state.captionStyle === 'outline') {
       ctx.fillStyle = 'rgba(20, 0, 30, 0.62)';
       ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = Math.max(2, size * 0.07);
+      ctx.lineWidth = Math.max(2, size * 0.09);
       ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
       ctx.shadowBlur = size * 0.14;
       ctx.strokeText(text, 0, 0);
@@ -453,7 +494,7 @@ function drawCaption(ctx, state, w, h) {
       ctx.fillText(text, 0, 0);
       ctx.shadowOffsetY = 0;
       ctx.strokeStyle = 'rgba(0, 229, 255, 0.9)';
-      ctx.lineWidth = Math.max(1, size * 0.018);
+      ctx.lineWidth = Math.max(1, size * 0.024);
       ctx.strokeText(text, 0, 0);
     } else if (state.captionStyle === 'vice') {
       // Sunset gradient letters: gold into orange into hot pink, keyed with
@@ -466,14 +507,14 @@ function drawCaption(ctx, state, w, h) {
       ctx.shadowBlur = size * 0.2;
       ctx.shadowOffsetY = size * 0.04;
       ctx.strokeStyle = '#16001f';
-      ctx.lineWidth = Math.max(3, size * 0.13);
+      ctx.lineWidth = Math.max(3, size * 0.16);
       ctx.strokeText(text, 0, 0);
       ctx.shadowOffsetY = 0;
       ctx.shadowBlur = 0;
       ctx.fillStyle = grad;
       ctx.fillText(text, 0, 0);
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-      ctx.lineWidth = Math.max(1, size * 0.014);
+      ctx.lineWidth = Math.max(1, size * 0.018);
       ctx.strokeText(text, 0, 0);
     } else {
       // Block: a hot-pink echo behind the letters, then a fat black keyline
@@ -484,7 +525,7 @@ function drawCaption(ctx, state, w, h) {
       ctx.shadowBlur = size * 0.1;
       ctx.shadowOffsetY = size * 0.02;
       ctx.strokeStyle = '#16001f';
-      ctx.lineWidth = Math.max(2, size * 0.12);
+      ctx.lineWidth = Math.max(2, size * 0.15);
       ctx.strokeText(text, 0, 0);
       ctx.fillStyle = '#ffffff';
       ctx.fillText(text, 0, 0);
@@ -541,6 +582,29 @@ export function renderCover(canvas, state) {
   ctx.strokeRect(frame / 2, frame / 2, w - frame, h - frame);
 
   applyGrade(ctx, w, h, state.grade);
+  // Neon Nights gets glowing panel seams: the white gutters catch a magenta
+  // neon edge, so the cuts themselves light up like a sign at night.
+  if (state.grade === 'neon') {
+    ctx.save();
+    ctx.shadowColor = '#ff00a8';
+    ctx.shadowBlur = Math.max(8, w * 0.014);
+    ctx.strokeStyle = 'rgba(255, 0, 168, 0.9)';
+    ctx.lineWidth = Math.max(2, w * 0.0022);
+    ctx.lineJoin = 'round';
+    for (const panel of panels) {
+      tracePath(ctx, panel.points);
+      ctx.stroke();
+    }
+    ctx.shadowColor = '#00e5ff';
+    ctx.shadowBlur = Math.max(6, w * 0.01);
+    ctx.strokeStyle = 'rgba(0, 229, 255, 0.55)';
+    ctx.lineWidth = Math.max(1, w * 0.0012);
+    for (const panel of panels) {
+      tracePath(ctx, panel.points);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
   drawCaption(ctx, state, w, h);
   return panels;
 }
